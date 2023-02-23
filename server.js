@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const { check, validationResult } = require("express-validator");
 const port = 3000;
 
 // List of Users

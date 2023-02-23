@@ -1,4 +1,5 @@
 const express = require("express");
+const { body, check, validationResult } = require("express-validator");
 const router = express.Router();
 
 let fruits = [
@@ -30,10 +31,20 @@ router.get("/:id", (req, res) => {
 });
 
 router.use(express.json());
-router.post("/", (req, res) => {
-  const fruit = { name: req.body.name, color: req.body.color };
-  fruits.push(fruit);
-  res.json(fruits);
+// check that the color field in the body of the post request is not empty and does have not spaces
+router.post("/", [check("color").trim().not().isEmpty()], (req, res) => {
+  // Check the request object passes the check defined above
+  const errors = validationResult(req);
+  // If the validationResults returns any errors, then trigger a response
+  if (!errors.isEmpty()) {
+    res.json({ error: errors.array() });
+  } else {
+    // If data is valid, push it into the fruits array
+
+    const fruit = { name: req.body.name, color: req.body.color };
+    fruits.push(fruit);
+    res.json(fruits);
+  }
 });
 
 router.use(express.json());

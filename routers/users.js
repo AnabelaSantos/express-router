@@ -1,4 +1,5 @@
 const express = require("express");
+const { body, check, validationResult } = require("express-validator");
 const router = express.Router();
 
 let users = [
@@ -30,10 +31,20 @@ router.get("/:id", (req, res) => {
 });
 
 router.use(express.json());
-router.post("/", (req, res) => {
-  const user = { name: req.body.name, age: req.body.age };
-  users.push(user);
-  res.json(users);
+// check that the name field in the body of the post request is not empty and does have not spaces
+router.post("/", [check("name").trim().isEmpty().not()], (req, res) => {
+  // Check the request object passes the check defined above
+  const errors = validationResult(req);
+  // If the validationResults returns any errors, then trigger a response
+  if (!errors.isEmpty()) {
+    res.json({ error: errors.array() });
+  } else {
+    // If data is valid, push it into the users array
+
+    const user = { name: req.body.name, age: req.body.age };
+    users.push(user);
+    res.json(users);
+  }
 });
 
 router.use(express.json());
